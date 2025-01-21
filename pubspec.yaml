@@ -1,0 +1,46 @@
+name: holiday_calendar
+description: "Bangladesh public holiday Calendar 2025"
+
+publish_to: 'none'
+
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.4
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  #all packages
+  cupertino_icons: ^1.0.8
+  intl: ^0.19.0
+  table_calendar: ^3.1.3
+  flutter_riverpod: ^2.6.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+
+  flutter_lints: ^5.0.0
+
+
+flutter:
+
+
+  uses-material-design: true
+
+  assets:
+    - assets/icons/
+    - assets/images/
+    - assets/fonts/
+    - assets/json/
+
+  fonts:
+    - family: Watford
+      fonts:
+        - asset: assets/fonts/watfard-regular.ttf
+          style: normal
+
