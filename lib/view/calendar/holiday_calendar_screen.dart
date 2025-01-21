@@ -9,7 +9,7 @@ import 'package:holiday_calendar/widgets/custom_app_bar.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 class HolidayCalendarScreen extends ConsumerWidget {
-  const HolidayCalendarScreen({Key? key}) : super(key: key);
+  const HolidayCalendarScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -53,7 +53,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
           boxShadow: [
             BoxShadow(
               color: Colors.grey.withOpacity(.3),
-              offset: const Offset(0.0, 1.0),
+              offset: const Offset(0.0, 0.05),
               blurRadius: 6.0,
             ),
           ],
@@ -96,7 +96,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
           },
           daysOfWeekHeight: 40,
           daysOfWeekStyle: const DaysOfWeekStyle(
-            weekdayStyle: TextStyle(color: AppColors.primaryColor),
+            weekdayStyle: TextStyle(color: AppColors.optionalColor),
             weekendStyle: TextStyle(color: Colors.red),
           ),
           onFormatChanged: notifier.onFormatChanged,
@@ -193,7 +193,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       child: Container(
-        height: 25,
+        height: 30,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
           color: AppColors.appbarColor.withOpacity(.2),
@@ -201,12 +201,13 @@ class HolidayCalendarScreen extends ConsumerWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // ...
+            Image.asset("assets/icons/img.png", width: 14, color: AppColors.blackColor.withOpacity(.6)),
+            SizedBox(width: 5),
             Text(
               resultedDate,
               style: getCustomTextStyle(
                 fontWeight: FontWeight.w400,
-                fontSize: 12,
+                fontSize: 14,
                 color: AppColors.blackColor,
               ),
             ),

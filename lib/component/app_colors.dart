@@ -7,8 +7,9 @@ class AppColors {
 
   ///app related colors
   static const Color primaryColor = Color(0xFF0037FF);
-  static const Color secondaryColor = Color(0xFF0851DA);
-  static const Color appbarColor = Color(0xFF0A58EA);
+  static const Color secondaryColor = Color(0xFF02A3FE);
+  static const Color optionalColor = Color(0xFF0087B9);
+  static const Color appbarColor = Color(0xFF02A3FE);
   static const Color textColor = Color(0xFF2B0000);
   static const Color hintsColor = Color(0xFF646464);
   static const Color titleColor = Color(0xFF020202);
