@@ -6,6 +6,12 @@ plugins {
 }
 
 android {
+    def keystoreProperties = new Properties()
+    def keystorePropertiesFile = rootProject.file("key.properties")
+    if (keystorePropertiesFile.exists()) {
+        keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+    }
+
     namespace = "com.example.holiday_calendar"
     compileSdk = 35
     ndkVersion = flutter.ndkVersion
@@ -29,12 +35,27 @@ android {
         versionName = flutter.versionName
     }
 
-    buildTypes {
+    signingConfigs {
         release {
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            keyAlias keystoreProperties['keyAlias']
+            keyPassword keystoreProperties['keyPassword']
+            storeFile file(keystoreProperties['storeFile'])
+            storePassword keystoreProperties['storePassword']
         }
     }
+
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            shrinkResources true
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            // debug config uses debug key
+        }
+    }
+
 }
 
 flutter {

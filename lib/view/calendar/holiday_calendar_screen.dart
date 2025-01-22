@@ -17,10 +17,6 @@ class HolidayCalendarScreen extends ConsumerWidget {
     final calendarState = ref.watch(holidayCalendarProvider);
     // Also get the Notifier to dispatch actions
     final calendarNotifier = ref.read(holidayCalendarProvider.notifier);
-    // Example data
-    final kToday = DateTime.now();
-    final kFirstDay = DateTime(kToday.year, kToday.month, kToday.day);
-    final kLastDay = DateTime(kToday.year + 5, kToday.month, kToday.day);
 
     return Scaffold(
       backgroundColor: AppColors.whiteColorJ,
@@ -51,7 +47,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
     HolidayCalendarNotifier notifier,
   ) {
     final kToday = DateTime.now();
-    final kFirstDay = DateTime(kToday.year, kToday.month, kToday.day);
+    final kFirstDay = DateTime(kToday.year, 1, 1);
     final kLastDay = DateTime(kToday.year + 5, kToday.month, kToday.day);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
@@ -127,7 +123,28 @@ class HolidayCalendarScreen extends ConsumerWidget {
                 return Center(
                   child: Container(
                     decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.15),
+                      color: Colors.red.withOpacity(0.2),
+                      shape: BoxShape.circle,
+                    ),
+                    padding: day.day < 10
+                        ? const EdgeInsets.all(15.5)
+                        : const EdgeInsets.all(12.0),
+                    child: Text(
+                      '${day.day}',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ),
+                );
+              }
+              return null;
+            },
+            holidayBuilder: (context, day, focusedDay) {
+              if (day.weekday == DateTime.friday ||
+                  day.weekday == DateTime.saturday) {
+                return Center(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.red.withOpacity(0.04),
                       shape: BoxShape.circle,
                     ),
                     padding: day.day < 10
@@ -140,7 +157,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
                   ),
                 );
               }
-              return null;
+              return null; // Default rendering for other days
             },
             selectedBuilder: (context, day, focusedDay) {
               return Center(
@@ -168,29 +185,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
                 ),
               );
             },
-            holidayBuilder: (context, day, focusedDay) {
-              if (day.weekday == DateTime.friday ||
-                  day.weekday == DateTime.saturday) {
-                return Center(
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.red.withOpacity(0.05),
-                      shape: BoxShape.circle,
-                    ),
-                    padding: day.day < 10
-                        ? const EdgeInsets.all(16.0)
-                        : const EdgeInsets.all(12.0),
-                    child: Text(
-                      '${day.day}',
-                      style: const TextStyle(color: Colors.red),
-                    ),
-                  ),
-                );
-              }
-              return null; // Default rendering for other days
-            },
           ),
-          // ... plus your styling/calendarBuilders ...
         ),
       ),
     );
