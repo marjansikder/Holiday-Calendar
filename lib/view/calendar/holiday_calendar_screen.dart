@@ -42,7 +42,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
   ) {
     final kToday = DateTime.now();
     final kFirstDay = DateTime(kToday.year, 1, 1);
-    final kLastDay = DateTime(kToday.year + 5, kToday.month, kToday.day);
+    final kLastDay = DateTime(kToday.year + 2, kToday.month, kToday.day);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Container(
@@ -76,8 +76,8 @@ class HolidayCalendarScreen extends ConsumerWidget {
           firstDay: kFirstDay,
           lastDay: kLastDay,
           calendarFormat: state.calendarFormat,
+          formatAnimationCurve: Curves.bounceInOut,
           weekNumbersVisible: false,
-          // Checking if the day is the selected day
           selectedDayPredicate: (day) => isSameDay(state.selectedDay, day),
           eventLoader: notifier.getEventsForDay,
           startingDayOfWeek: StartingDayOfWeek.sunday,
@@ -149,7 +149,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
                   ),
                 );
               }
-              return null; // Default rendering for other days
+              return null;
             },
             selectedBuilder: (context, day, focusedDay) {
               return Center(
@@ -197,14 +197,14 @@ class HolidayCalendarScreen extends ConsumerWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset("assets/icons/img.png",
-                width: 14, color: AppColors.blackColor.withOpacity(.6)),
+                width: 14, color: AppColors.optionalColor.withOpacity(.8)),
             SizedBox(width: 5),
             Text(
               resultedDate,
               style: getCustomTextStyle(
                 fontWeight: FontWeight.w400,
                 fontSize: 14,
-                color: AppColors.blackColor,
+                color: AppColors.optionalColor,
               ),
             ),
           ],
