@@ -156,7 +156,6 @@ class HolidayCalendarScreen extends ConsumerWidget {
                 child: Container(
                   decoration: state.selectedDay == day
                       ? BoxDecoration(
-                          //color: AppColors.kPending.withOpacity(0.4),
                           border: Border.all(color: AppColors.appbarColor),
                           shape: BoxShape.circle,
                         )
