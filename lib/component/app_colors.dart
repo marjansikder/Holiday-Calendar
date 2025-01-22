@@ -11,7 +11,8 @@ class AppColors {
   static const Color optionalColor = Color(0xFF0087B9);
   static const Color appbarColor = Color(0xFF02A3FE);
   static const Color textColor = Color(0xFF2B0000);
-  static const Color hintsColor = Color(0xFF646464);
+  static const Color hintsColor = Color(0xFF969696);
+  static const Color disableColor = Color(0xFF909090);
   static const Color titleColor = Color(0xFF020202);
   static const Color buttonTextColor = Color(0xFF363637);
   static const Color backgroundColor = Color(0xFF3665FF);
@@ -29,9 +30,10 @@ class AppColors {
   ///mixed colors
   static const Color lightColor = Color(0xFF8BDEFF);
   static const Color deepColor = Color(0xFF0087B9);
+  static const Color appColor = Color(0x3302A3FE);
 
   ///light colors
-  static const whiteColorA = Color(0xFFDCE9FF);
+  static const whiteColorA = Color(0xFFEEF3FD);
   static const whiteColorB = Color(0xFFF1F1F5);
   static const whiteColorC = Color(0xFFF6F8FC);
   static const whiteColorD = Color(0xFFFFFFFF);
@@ -39,8 +41,9 @@ class AppColors {
   static const whiteColorF = Color(0xFFFFFFFF);
   static const whiteColorG = Color(0xFFF6F8FF);
   static const whiteColorH = Color(0xffd7e3f8);
+  static const whiteColorZ = Color(0xFFC5F5FB);
   static const whiteColorI = Color(0xFFD9D9D9);
-  static const whiteColorJ = Color(0xFFF2F4FF);
+  static const whiteColorJ = Color(0xFFF2FFFC);
   static const whiteColorK = Color(0xFFF6F6F6);
   static const skinColorS = Color(0xffF4F2FB);
   static const skinColorK = Color(0xffFBF2F2);

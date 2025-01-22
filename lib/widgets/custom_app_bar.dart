@@ -20,7 +20,7 @@ class CustomAppBarWithShadow extends StatelessWidget
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.appbarColor.withOpacity(.9), // AppBar background color
+        color: AppColors.appbarColor.withOpacity(.3), // AppBar background color
         boxShadow: [
           BoxShadow(
             blurRadius: 2,
@@ -36,7 +36,7 @@ class CustomAppBarWithShadow extends StatelessWidget
         title: Center(
           child: Text(title,
               style: getCustomTextStyle(
-                  color: AppColors.whiteColor,
+                  color: AppColors.textColor,
                   fontWeight: FontWeight.w500,
                   fontSize: 22,
                   fontFamily: 'Watford')),

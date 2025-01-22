@@ -24,8 +24,8 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: RouteName.holidayCalendar,
-      onGenerateRoute: Routes.generateRoutes,
+      initialRoute: AppRoutes.holidayCalendarScreen,
+      routes: AppRoutes.getRoutes(),
     );
   }
 }

@@ -17,10 +17,16 @@ class HolidayCalendarScreen extends ConsumerWidget {
     final calendarState = ref.watch(holidayCalendarProvider);
     // Also get the Notifier to dispatch actions
     final calendarNotifier = ref.read(holidayCalendarProvider.notifier);
+    // Example data
+    final kToday = DateTime.now();
+    final kFirstDay = DateTime(kToday.year, kToday.month, kToday.day);
+    final kLastDay = DateTime(kToday.year + 5, kToday.month, kToday.day);
 
     return Scaffold(
+      backgroundColor: AppColors.whiteColorJ,
       appBar: CustomAppBarWithShadow(
-          title: 'Holiday ${calendarState.focusedDay.year}'),
+        title: 'Holiday ${calendarState.focusedDay.year}',
+      ),
       body: Column(
         children: [
           const SizedBox(height: 2),
@@ -44,6 +50,9 @@ class HolidayCalendarScreen extends ConsumerWidget {
     HolidayCalendarState state,
     HolidayCalendarNotifier notifier,
   ) {
+    final kToday = DateTime.now();
+    final kFirstDay = DateTime(kToday.year, kToday.month, kToday.day);
+    final kLastDay = DateTime(kToday.year + 5, kToday.month, kToday.day);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: Container(
@@ -52,7 +61,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
           color: AppColors.whiteColor,
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(.3),
+              color: Colors.grey.withOpacity(.2),
               offset: const Offset(0.0, 0.05),
               blurRadius: 6.0,
             ),
@@ -68,22 +77,19 @@ class HolidayCalendarScreen extends ConsumerWidget {
               titleTextStyle:
                   const TextStyle(fontSize: 16, color: AppColors.blackColor),
               decoration: BoxDecoration(
-                color: AppColors.appbarColor.withOpacity(.2),
+                color: AppColors.appbarColor.withOpacity(.15),
                 borderRadius: const BorderRadius.only(
                   topRight: Radius.circular(5),
                   topLeft: Radius.circular(5),
                 ),
               )),
           focusedDay: state.focusedDay,
-          firstDay: DateTime(state.focusedDay.year, 1, 1),
-          lastDay: DateTime(state.focusedDay.year + 5, 12, 31),
+          firstDay: kFirstDay,
+          lastDay: kLastDay,
           calendarFormat: state.calendarFormat,
           weekNumbersVisible: false,
           // Checking if the day is the selected day
-          selectedDayPredicate: (day) =>
-              day.year == state.selectedDay?.year &&
-              day.month == state.selectedDay?.month &&
-              day.day == state.selectedDay?.day,
+          selectedDayPredicate: (day) => isSameDay(state.selectedDay, day),
           eventLoader: notifier.getEventsForDay,
           startingDayOfWeek: StartingDayOfWeek.sunday,
           weekendDays: const [DateTime.friday, DateTime.saturday],
@@ -102,17 +108,19 @@ class HolidayCalendarScreen extends ConsumerWidget {
           onFormatChanged: notifier.onFormatChanged,
           onPageChanged: notifier.onPageChanged,
           calendarStyle: CalendarStyle(
-              markerSize: 0,
-              outsideDaysVisible: false,
-              canMarkersOverflow: false,
-              selectedTextStyle: const TextStyle(color: Colors.white),
-              todayDecoration: BoxDecoration(
-                color: AppColors.appbarColor.withOpacity(0.6),
-                shape: BoxShape.circle,
-              ),
-              defaultDecoration: const BoxDecoration(
-                shape: BoxShape.circle,
-              )),
+            markerSize: 0,
+            outsideDaysVisible: false,
+            canMarkersOverflow: false,
+            selectedTextStyle: const TextStyle(color: Colors.white),
+            todayDecoration: BoxDecoration(
+              color: AppColors.appbarColor.withOpacity(0.6),
+              shape: BoxShape.circle,
+            ),
+            defaultDecoration: const BoxDecoration(
+              shape: BoxShape.circle,
+            ),
+            disabledTextStyle: TextStyle(color: AppColors.disableColor)
+          ),
           calendarBuilders: CalendarBuilders(
             markerBuilder: (context, day, events) {
               if (events.isNotEmpty && day != state.selectedDay) {
@@ -196,12 +204,13 @@ class HolidayCalendarScreen extends ConsumerWidget {
         height: 30,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(5),
-          color: AppColors.appbarColor.withOpacity(.2),
+          color: AppColors.appbarColor.withOpacity(.15),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Image.asset("assets/icons/img.png", width: 14, color: AppColors.blackColor.withOpacity(.6)),
+            Image.asset("assets/icons/img.png",
+                width: 14, color: AppColors.blackColor.withOpacity(.6)),
             SizedBox(width: 5),
             Text(
               resultedDate,
@@ -228,30 +237,33 @@ class HolidayCalendarScreen extends ConsumerWidget {
             margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
             padding: const EdgeInsets.all(8.0),
             decoration: BoxDecoration(
-              color: AppColors.appbarColor.withOpacity(.2),
+              color: AppColors.appbarColor.withOpacity(.15),
               borderRadius: BorderRadius.circular(5.0),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  event.holidayEn,
-                  style: getCustomTextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
-                    color: Colors.black,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 6.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    event.holidayEn,
+                    style: getCustomTextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.normal,
+                      color: Colors.black,
+                    ),
                   ),
-                ),
-                Text(
-                  event.holidayBn,
-                  style: getCustomTextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.normal,
-                    color: AppColors.titleColor,
+                  Text(
+                    event.holidayBn,
+                    style: getCustomTextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.normal,
+                      color: AppColors.titleColor,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 6),
-              ],
+                  const SizedBox(height: 6),
+                ],
+              ),
             ),
           );
         },
