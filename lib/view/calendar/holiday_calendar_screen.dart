@@ -13,9 +13,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Riverpod: read the entire calendar state
     final calendarState = ref.watch(holidayCalendarProvider);
-    // Also get the Notifier to dispatch actions
     final calendarNotifier = ref.read(holidayCalendarProvider.notifier);
 
     return Scaffold(
@@ -26,16 +24,12 @@ class HolidayCalendarScreen extends ConsumerWidget {
       body: Column(
         children: [
           const SizedBox(height: 2),
-          // The calendar
           _buildTableCalendar(calendarState, calendarNotifier),
           const SizedBox(height: 8),
-          // The selected date label
           _buildSelectedDate(calendarNotifier),
           const SizedBox(height: 10),
-          // The events list
           _buildEventList(calendarState),
           const SizedBox(height: 12),
-          // The Today button
           _buildTodayButton(calendarState, calendarNotifier),
         ],
       ),
@@ -66,7 +60,6 @@ class HolidayCalendarScreen extends ConsumerWidget {
         child: TableCalendar(
           locale: 'en_US',
           headerStyle: HeaderStyle(
-              //headerMargin: EdgeInsets.only(left: 8, right: 8, bottom: 12, top: 8),
               headerPadding: const EdgeInsets.only(left: 8, right: 8),
               formatButtonVisible: false,
               titleCentered: true,
@@ -104,19 +97,18 @@ class HolidayCalendarScreen extends ConsumerWidget {
           onFormatChanged: notifier.onFormatChanged,
           onPageChanged: notifier.onPageChanged,
           calendarStyle: CalendarStyle(
-            markerSize: 0,
-            outsideDaysVisible: false,
-            canMarkersOverflow: false,
-            selectedTextStyle: const TextStyle(color: Colors.white),
-            todayDecoration: BoxDecoration(
-              color: AppColors.appbarColor.withOpacity(0.6),
-              shape: BoxShape.circle,
-            ),
-            defaultDecoration: const BoxDecoration(
-              shape: BoxShape.circle,
-            ),
-            disabledTextStyle: TextStyle(color: AppColors.disableColor)
-          ),
+              markerSize: 0,
+              outsideDaysVisible: false,
+              canMarkersOverflow: false,
+              selectedTextStyle: const TextStyle(color: Colors.white),
+              todayDecoration: BoxDecoration(
+                color: AppColors.appbarColor.withOpacity(0.6),
+                shape: BoxShape.circle,
+              ),
+              defaultDecoration: const BoxDecoration(
+                shape: BoxShape.circle,
+              ),
+              disabledTextStyle: TextStyle(color: AppColors.disableColor)),
           calendarBuilders: CalendarBuilders(
             markerBuilder: (context, day, events) {
               if (events.isNotEmpty && day != state.selectedDay) {
