@@ -56,6 +56,28 @@ class DBService {
     });
   }
 
+  // db_service.dart
+  Future<int> deleteEvent(DateTime date, Event event) async {
+    final database = await db;
+    final dateString = _formatDate(date); // e.g., 'yyyy-MM-dd'
+
+    // If each event has a unique ID column, it’s best to use that:
+    // where: '$columnId = ?',
+    // whereArgs: [event.id],
+
+    // Otherwise, match on date + holidayBn + holidayEn:
+    return await database.delete(
+      tableEvents,
+      where: '$columnDate = ? AND $columnHolidayBn = ? AND $columnHolidayEn = ?',
+      whereArgs: [
+        dateString,
+        event.holidayBn,
+        event.holidayEn,
+      ],
+    );
+  }
+
+
   // Fetch all events matching a date
   Future<List<Event>> getEventsByDate(DateTime date) async {
     final database = await db;

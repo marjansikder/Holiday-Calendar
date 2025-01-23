@@ -53,9 +53,20 @@ class HolidayRepository {
     await dbService.insertEvent(date, event);
   }
 
+  // holiday_repository.dart
+  Future<void> deleteEvent(DateTime date, Event event) async {
+    // If you have a DB service:
+    await dbService.deleteEvent(date, event);
+  }
+
+
   /// Retrieve events from DB for a given date
   Future<List<Event>> getEventsForDay(DateTime date) async {
     return await dbService.getEventsByDate(date);
+  }
+
+  List<Event> getEvents(DateTime day) {
+    return _mockEvents[day] ?? [];
   }
 }
 

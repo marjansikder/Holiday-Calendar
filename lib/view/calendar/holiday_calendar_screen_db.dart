@@ -28,7 +28,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
           // Display selected date
           _buildSelectedDate(calendarNotifier),
           // Show events for the selected day
-          _buildEventList(calendarState),
+          _buildEventList(calendarState, calendarNotifier),
           // The "Today" button
           _buildTodayButton(calendarState, calendarNotifier),
           // The "Add Event" button
@@ -70,8 +70,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
         formatAnimationCurve: Curves.bounceInOut,
         weekNumbersVisible: false,
         selectedDayPredicate: (day) => isSameDay(state.selectedDay, day),
-        eventLoader: notifier.getEventsForDaySync,
-        //eventLoader: (day) => [],
+        eventLoader: notifier.getHolidays,
         startingDayOfWeek: StartingDayOfWeek.sunday,
         weekendDays: const [DateTime.friday, DateTime.saturday],
         onDaySelected: (selectedDay, focusedDay) {
@@ -123,7 +122,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
             return null;
           },
 
-          /*holidayBuilder: (context, day, focusedDay) {
+          holidayBuilder: (context, day, focusedDay) {
             if (day.weekday == DateTime.friday ||
                 day.weekday == DateTime.saturday) {
               return Center(
@@ -143,7 +142,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
               );
             }
             return null;
-          },*/
+          },
           selectedBuilder: (context, day, focusedDay) {
             return Center(
               child: Container(
@@ -204,7 +203,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEventList(HolidayCalendarState state) {
+  Widget _buildEventList(HolidayCalendarState state, HolidayCalendarNotifier notifier) {
     final events = state.selectedEvents;
     return Expanded(
       child: ListView.builder(
@@ -220,26 +219,37 @@ class HolidayCalendarScreen extends ConsumerWidget {
             ),
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 6.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    event.holidayEn,
-                    style: getCustomTextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.normal,
-                      color: Colors.black,
-                    ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        event.holidayEn,
+                        style: getCustomTextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.normal,
+                          color: Colors.black,
+                        ),
+                      ),
+                      Text(
+                        event.holidayBn,
+                        style: getCustomTextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.normal,
+                          color: AppColors.titleColor,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                    ],
                   ),
-                  Text(
-                    event.holidayBn,
-                    style: getCustomTextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.normal,
-                      color: AppColors.titleColor,
-                    ),
+                  IconButton(
+                    icon: Icon(Icons.delete),
+                    onPressed: () {
+                      notifier.deleteEventForSelectedDay(event);
+                    },
                   ),
-                  const SizedBox(height: 6),
                 ],
               ),
             ),

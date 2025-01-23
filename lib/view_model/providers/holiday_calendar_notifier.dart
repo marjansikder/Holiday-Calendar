@@ -31,20 +31,19 @@ class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
     );
   }
 
-  // Cache for day -> list of events
-  final Map<DateTime, List<Event>> _eventCache = {};
 
 
-  // Synchronous getter for TableCalendar
-  List<Event> getEventsForDaySync(DateTime day) {
-    final dayKey = DateTime(day.year, day.month, day.day);
-    return _eventCache[dayKey] ?? [];
+
+
+  List<Event> getHolidays(DateTime day) {
+    return _repository.getEvents(day);
   }
 
 
   Future<List<Event>> getEventsForDay(DateTime day) {
     return _repository.getEventsForDay(day);
   }
+
 
 
   // Called when user taps a day in the calendar
@@ -88,6 +87,17 @@ class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
     final updatedEvents = await _repository.getEventsForDay(state.selectedDay!);
     state = state.copyWith(selectedEvents: updatedEvents);
   }
+
+  Future<void> deleteEventForSelectedDay(Event event) async {
+    if (state.selectedDay == null) return;
+    // 1) Delete from DB
+    await _repository.deleteEvent(state.selectedDay!, event);
+
+    // 2) Re-fetch updated events
+    final updatedEvents = await _repository.getEventsForDay(state.selectedDay!);
+    state = state.copyWith(selectedEvents: updatedEvents);
+  }
+
 
   // Utility to get a formatted selected day
   String getSelectedDayFormatted() {
