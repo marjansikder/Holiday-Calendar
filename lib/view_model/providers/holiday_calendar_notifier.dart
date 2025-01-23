@@ -31,8 +31,19 @@ class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
     );
   }
 
-  Future<List<Event>> getEventsForDay(DateTime day) async {
-    return await _repository.getEventsForDay(day);
+  // Cache for day -> list of events
+  final Map<DateTime, List<Event>> _eventCache = {};
+
+
+  // Synchronous getter for TableCalendar
+  List<Event> getEventsForDaySync(DateTime day) {
+    final dayKey = DateTime(day.year, day.month, day.day);
+    return _eventCache[dayKey] ?? [];
+  }
+
+
+  Future<List<Event>> getEventsForDay(DateTime day) {
+    return _repository.getEventsForDay(day);
   }
 
 

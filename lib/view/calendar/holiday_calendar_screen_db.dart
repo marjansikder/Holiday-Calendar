@@ -70,8 +70,8 @@ class HolidayCalendarScreen extends ConsumerWidget {
         formatAnimationCurve: Curves.bounceInOut,
         weekNumbersVisible: false,
         selectedDayPredicate: (day) => isSameDay(state.selectedDay, day),
-        //eventLoader: notifier.getEventsForDay,
-        eventLoader: (day) => [],
+        eventLoader: notifier.getEventsForDaySync,
+        //eventLoader: (day) => [],
         startingDayOfWeek: StartingDayOfWeek.sunday,
         weekendDays: const [DateTime.friday, DateTime.saturday],
         onDaySelected: (selectedDay, focusedDay) {
@@ -103,9 +103,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
             disabledTextStyle: TextStyle(color: AppColors.disableColor)),
         calendarBuilders: CalendarBuilders(
           markerBuilder: (context, day, events) {
-            // Check if any of the day's events are marked as holiday
-            final hasHoliday = events.any((event) => event == true);
-            if (hasHoliday && day != state.selectedDay) {
+            if (events.isNotEmpty && day != state.selectedDay) {
               return Center(
                 child: Container(
                   decoration: BoxDecoration(
@@ -117,7 +115,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
                       : const EdgeInsets.all(12.0),
                   child: Text(
                     '${day.day}',
-                    style: const TextStyle(color: Colors.red),
+                    style: TextStyle(color: Colors.red),
                   ),
                 ),
               );

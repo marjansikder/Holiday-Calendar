@@ -6,5 +6,5 @@ class Event {
   /// or a user-created event
   final bool isHoliday;
 
-  const Event(this.holidayBn, this.holidayEn, {this.isHoliday = true});
+  const Event(this.holidayBn, this.holidayEn, {this.isHoliday = false});
 }
