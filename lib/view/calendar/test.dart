@@ -79,8 +79,8 @@ class HolidayCalendarScreen extends ConsumerWidget {
           formatAnimationCurve: Curves.bounceInOut,
           weekNumbersVisible: false,
           selectedDayPredicate: (day) => isSameDay(state.selectedDay, day),
-          //eventLoader: notifier.getEventsForDay,
-          eventLoader: (day) => [],
+          eventLoader: notifier.getEventsForDay,
+          //eventLoader: (day) => [],
           startingDayOfWeek: StartingDayOfWeek.sunday,
           weekendDays: const [DateTime.friday, DateTime.saturday],
           onDaySelected: (selectedDay, focusedDay) {
