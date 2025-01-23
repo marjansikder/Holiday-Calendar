@@ -3,7 +3,7 @@ description: "Bangladesh public holiday Calendar 2025"
 
 publish_to: 'none'
 
-version: 1.0.0+1
+version: 1.0.0+3
 
 environment:
   sdk: ^3.5.4
