@@ -31,6 +31,11 @@ class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
     );
   }
 
+  Future<List<Event>> getEventsForDay(DateTime day) async {
+    return await _repository.getEventsForDay(day);
+  }
+
+
   // Called when user taps a day in the calendar
   Future<void> onDaySelected(DateTime selectedDay, DateTime focusedDay) async {
     final events = await _repository.getEventsForDay(selectedDay);
