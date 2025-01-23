@@ -1,8 +1,8 @@
 import 'package:holiday_calendar/model/models/event_model.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
+import 'dart:collection';
 
- // or event_model.dart
 
 class DBService {
   static final DBService _instance = DBService._internal();
@@ -11,12 +11,12 @@ class DBService {
 
   Database? _db;
 
-  // Name of the table and database fields
-  static const String _tableEvents = 'events';
+  // Table & columns
+  static const String tableEvents = 'events';
   static const String columnId = 'id';
-  static const String columnTitleEn = 'holidayEn';
-  static const String columnTitleBn = 'holidayBn';
-  static const String columnDate = 'date'; // we can store date as ISO string or timestamp
+  static const String columnDate = 'date';
+  static const String columnHolidayBn = 'holidayBn';
+  static const String columnHolidayEn = 'holidayEn';
 
   Future<Database> get db async {
     if (_db != null) return _db!;
@@ -24,60 +24,92 @@ class DBService {
     return _db!;
   }
 
+  // Initialize the database
   Future<Database> _initDB() async {
     final dbPath = await getDatabasesPath();
-    final path = p.join(dbPath, 'holidays.db');
+    final path = p.join(dbPath, 'holiday.db');
 
-    // Open or create the database
     return await openDatabase(
       path,
       version: 1,
       onCreate: (db, version) async {
-        // Create the table
         await db.execute('''
-          CREATE TABLE $_tableEvents (
+          CREATE TABLE $tableEvents (
             $columnId INTEGER PRIMARY KEY AUTOINCREMENT,
-            $columnTitleEn TEXT NOT NULL,
-            $columnTitleBn TEXT NOT NULL,
-            $columnDate TEXT NOT NULL
+            $columnDate TEXT NOT NULL,
+            $columnHolidayBn TEXT NOT NULL,
+            $columnHolidayEn TEXT NOT NULL
           )
         ''');
       },
     );
   }
 
-  // Insert event into DB
-  Future<int> insertEvent(Event event, DateTime date) async {
+  // Insert a single event into the database
+  Future<int> insertEvent(DateTime date, Event event) async {
     final database = await db;
-    // For date, you can store as an ISO string ('yyyy-MM-dd') or full dateTime
     final dateString = _formatDate(date);
-    return await database.insert(_tableEvents, {
-      columnTitleEn: event.holidayEn,
-      columnTitleBn: event.holidayBn,
+    return await database.insert(tableEvents, {
       columnDate: dateString,
+      columnHolidayBn: event.holidayBn,
+      columnHolidayEn: event.holidayEn,
     });
   }
 
-  // Fetch events for a specific date
-  Future<List<Event>> getEventsForDate(DateTime date) async {
+  // Fetch all events matching a date
+  Future<List<Event>> getEventsByDate(DateTime date) async {
     final database = await db;
     final dateString = _formatDate(date);
     final result = await database.query(
-      _tableEvents,
+      tableEvents,
       where: '$columnDate = ?',
       whereArgs: [dateString],
     );
-    return result.map((row) => Event(
-      row[columnTitleBn] as String,
-      row[columnTitleEn] as String,
-    )).toList();
+    return result.map((map) {
+      return Event(
+        map[columnHolidayBn] as String,
+        map[columnHolidayEn] as String,
+      );
+    }).toList();
   }
 
-  // Example: format date as 'yyyy-MM-dd'
+  // Optional: fetch all events in the DB
+  Future<List<Map<String, dynamic>>> getAllRows() async {
+    final database = await db;
+    return await database.query(tableEvents);
+  }
+
+  /// Insert multiple events from a `LinkedHashMap<DateTime, List<Event>>`.
+  /// This is how we'll pre-populate from `_mockEvents`.
+  Future<void> insertMockEvents(
+      LinkedHashMap<DateTime, List<Event>> mockData,
+      ) async {
+    final database = await db;
+
+    // We may want to check if table is empty before inserting
+    final count = Sqflite.firstIntValue(
+      await database.rawQuery('SELECT COUNT(*) FROM $tableEvents'),
+    );
+
+    // Only insert if we have no data yet:
+    if (count == 0) {
+      // Insert each event
+      for (final entry in mockData.entries) {
+        final date = entry.key;
+        final events = entry.value;
+
+        for (final event in events) {
+          await insertEvent(date, event);
+        }
+      }
+    }
+  }
+
+  /// Format date as 'yyyy-MM-dd' so we can match exact days
   String _formatDate(DateTime date) {
-    // Or use a more robust approach with intl if you prefer
-    return '${date.year.toString().padLeft(4,'0')}-'
-        '${date.month.toString().padLeft(2,'0')}-'
-        '${date.day.toString().padLeft(2,'0')}';
+    // Could also use intl DateFormat if you prefer
+    return '${date.year.toString().padLeft(4, '0')}-'
+        '${date.month.toString().padLeft(2, '0')}-'
+        '${date.day.toString().padLeft(2, '0')}';
   }
 }
