@@ -1,20 +1,21 @@
-import 'package:holiday_calendar/model/models/event_model.dart';
-import 'package:holiday_calendar/model/repository/repository.dart';
-import 'package:intl/intl.dart';
+
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:holiday_calendar/model/models/event_model.dart';
+import 'package:intl/intl.dart';
 import 'package:table_calendar/table_calendar.dart';
+
+import '../../model/repository/holiday_repository.dart';
 import 'holiday_calendar_provider.dart';
 import 'holiday_calendar_state.dart';
 
-/// A Riverpod Notifier that manages the holiday calendar state.
 class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
   late final HolidayRepository _repository;
 
+  @override
   HolidayCalendarState build() {
-    // Read the repository from another provider (defined below).
-    _repository = ref.watch(holidayRepositoryProvider);
+    _repository = ref.watch(holidayRepositoryDbProvider);
 
-    // Initialize default state
     final now = DateTime.now();
     return HolidayCalendarState(
       calendarFormat: CalendarFormat.month,
@@ -25,8 +26,9 @@ class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
     );
   }
 
-  void onDaySelected(DateTime selectedDay, DateTime focusedDay) {
-    final events = _repository.getEventsForDay(selectedDay);
+  // Called when user taps on a day in the calendar
+  Future<void> onDaySelected(DateTime selectedDay, DateTime focusedDay) async {
+    final events = await _repository.getEventsForDay(selectedDay);
     state = state.copyWith(
       selectedDay: selectedDay,
       focusedDay: focusedDay,
@@ -42,14 +44,12 @@ class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
   }
 
   void onPageChanged(DateTime focusedDay) {
-    state = state.copyWith(
-      focusedDay: focusedDay,
-      showResetButton: true,
-    );
+    state = state.copyWith(focusedDay: focusedDay, showResetButton: true);
   }
 
-  void resetToCurrentDay() {
+  Future<void> resetToCurrentDay() async {
     final now = DateTime.now();
+    // Clear selected events
     state = state.copyWith(
       selectedDay: now,
       focusedDay: now,
@@ -58,14 +58,29 @@ class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
     );
   }
 
-  // Called by TableCalendar in "eventLoader" to get events for a given day
-  List<Event> getEventsForDay(DateTime day) {
-    return _repository.getEventsForDay(day);
+  // Insert a new event into the DB for the currently selected day
+  Future<void> addEventForSelectedDay(Event event) async {
+    if (state.selectedDay == null) return;
+
+    // Insert into DB
+    await _repository.addEvent(event, state.selectedDay!);
+
+    // Refresh events for that day
+    final updatedEvents = await _repository.getEventsForDay(state.selectedDay!);
+
+    // Update state
+    state = state.copyWith(selectedEvents: updatedEvents);
   }
 
-  // Utility to get a formatted selected day
+  // For TableCalendar
+  Future<List<Event>> getEventsForDay(DateTime day) async {
+    return await _repository.getEventsForDay(day);
+  }
+
+  // For your date label
   String getSelectedDayFormatted() {
     final day = state.selectedDay ?? DateTime.now();
     return DateFormat("dd/MM/yyyy").format(day);
   }
 }
+
