@@ -23,16 +23,12 @@ class HolidayCalendarScreen extends ConsumerWidget {
       ),
       body: Column(
         children: [
-          // TableCalendar
           _buildTableCalendar(calendarState, calendarNotifier),
-          // Display selected date
           _buildSelectedDate(calendarNotifier),
-          // Show events for the selected day
           _buildEventList(calendarState, calendarNotifier),
-          // The "Today" button
           _buildTodayButton(calendarState, calendarNotifier),
-          // The "Add Event" button
-          _buildAddEventButton(context, calendarNotifier),
+          _buildAddEventButton(calendarState, context, calendarNotifier),
+          const SizedBox(height: 20)
         ],
       ),
     );
@@ -121,7 +117,6 @@ class HolidayCalendarScreen extends ConsumerWidget {
             }
             return null;
           },
-
           holidayBuilder: (context, day, focusedDay) {
             if (day.weekday == DateTime.friday ||
                 day.weekday == DateTime.saturday) {
@@ -203,7 +198,8 @@ class HolidayCalendarScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildEventList(HolidayCalendarState state, HolidayCalendarNotifier notifier) {
+  Widget _buildEventList(
+      HolidayCalendarState state, HolidayCalendarNotifier notifier) {
     final events = state.selectedEvents;
     return Expanded(
       child: ListView.builder(
@@ -267,18 +263,46 @@ class HolidayCalendarScreen extends ConsumerWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        ElevatedButton(
-          onPressed: notifier.resetToCurrentDay,
-          child: const Text('Today'),
+        Padding(
+          padding: const EdgeInsets.all(15.0),
+          child: InkWell(
+            onTap: notifier.resetToCurrentDay,
+            child: Container(
+              width: 70,
+              height: 50,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                color: AppColors.appbarColor.withOpacity(.8),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.grey.withOpacity(.3),
+                    offset: const Offset(0.0, 3.0),
+                    blurRadius: 6.0,
+                  ),
+                ],
+              ),
+              child: const Center(
+                child: Text(
+                  'Today',
+                  style: TextStyle(
+                    color: AppColors.whiteColor,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ],
     );
   }
 
   Widget _buildAddEventButton(
+    HolidayCalendarState state,
     BuildContext context,
     HolidayCalendarNotifier notifier,
   ) {
+    if (!state.showResetButton) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.all(8.0),
       child: ElevatedButton.icon(
