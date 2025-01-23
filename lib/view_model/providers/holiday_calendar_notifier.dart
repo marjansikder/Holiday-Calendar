@@ -1,5 +1,6 @@
 
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:holiday_calendar/model/models/event_model.dart';
 import 'package:intl/intl.dart';
@@ -35,7 +36,7 @@ class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
 
 
 
-  List<Event> getHolidays(DateTime day) {
+  List<Event>? getHolidays(DateTime day) {
     return _repository.getEvents(day);
   }
 
@@ -77,6 +78,7 @@ class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
     );
   }
 
+
   /// Insert a new event into the DB for the selected day.
   Future<void> addEventForSelectedDay(Event event) async {
     if (state.selectedDay == null) return;
@@ -103,6 +105,26 @@ class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
   String getSelectedDayFormatted() {
     final day = state.selectedDay ?? DateTime.now();
     return DateFormat("dd/MM/yyyy").format(day);
+  }
+
+  final Map<DateTime, List<Event>> _dayEventsCache = {};
+
+  List<Event>? all = [];
+
+
+  /// Asynchronous method to fetch events from DB and store them in `_dayEventsCache`.
+  Future<void> loadEventsForDay(DateTime day) async {
+    final eventsFromDB = await _repository.getEventsForDay(day);
+    _dayEventsCache[day] = eventsFromDB;
+    // to rebuild UI if needed
+  }
+
+  /// Synchronous method returning events from cache
+  List<Event> getEventsForDaySync(DateTime day) {
+    final events =  getHolidays(day);
+    //all = (_dayEventsCache[day] ?? []) + (events ?? []);
+    //print(all.toString());
+    return events ?? [];
   }
 }
 

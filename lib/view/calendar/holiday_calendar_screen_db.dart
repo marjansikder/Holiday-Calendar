@@ -12,10 +12,15 @@ import '../../widgets/custom_app_bar.dart';
 class HolidayCalendarScreen extends ConsumerWidget {
   const HolidayCalendarScreen({Key? key}) : super(key: key);
 
+
+
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final calendarState = ref.watch(holidayCalendarProvider);
     final calendarNotifier = ref.read(holidayCalendarProvider.notifier);
+
+
 
     return Scaffold(
       appBar: CustomAppBarWithShadow(
@@ -36,7 +41,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
 
   Widget _buildTableCalendar(
     HolidayCalendarState state,
-    HolidayCalendarNotifier notifier,
+    HolidayCalendarNotifier notifier
   ) {
     final kToday = DateTime.now();
     final kFirstDay = DateTime(kToday.year, 1, 1);
@@ -66,7 +71,7 @@ class HolidayCalendarScreen extends ConsumerWidget {
         formatAnimationCurve: Curves.bounceInOut,
         weekNumbersVisible: false,
         selectedDayPredicate: (day) => isSameDay(state.selectedDay, day),
-        eventLoader: notifier.getHolidays,
+        eventLoader: notifier.getEventsForDaySync,
         startingDayOfWeek: StartingDayOfWeek.sunday,
         weekendDays: const [DateTime.friday, DateTime.saturday],
         onDaySelected: (selectedDay, focusedDay) {
