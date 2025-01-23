@@ -44,20 +44,118 @@ class HolidayCalendarScreen extends ConsumerWidget {
       HolidayCalendarState state,
       HolidayCalendarNotifier notifier,
       ) {
+    final kToday = DateTime.now();
+    final kFirstDay = DateTime(kToday.year, 1, 1);
+    final kLastDay = DateTime(kToday.year + 2, kToday.month, kToday.day);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       child: TableCalendar(
-        focusedDay: state.focusedDay,
-        firstDay: DateTime(2020),
-        lastDay: DateTime(2030),
-        calendarFormat: state.calendarFormat,
-        selectedDayPredicate: (day) => day == state.selectedDay,
-        eventLoader: (day) => [],  // We'll handle the list display ourselves.
+        locale: 'en_US',
+        headerStyle: HeaderStyle(
+            headerPadding: const EdgeInsets.only(left: 8, right: 8),
+            formatButtonVisible: false,
+            titleCentered: true,
+            titleTextStyle:
+            const TextStyle(fontSize: 16, color: AppColors.blackColor),
+            decoration: BoxDecoration(
+              color: AppColors.appbarColor.withOpacity(.15),
+              borderRadius: const BorderRadius.only(
+                topRight: Radius.circular(5),
+                topLeft: Radius.circular(5),
+              ),
+            )),
+        startingDayOfWeek: StartingDayOfWeek.sunday,
+        weekendDays: const [DateTime.friday, DateTime.saturday],
         onDaySelected: (selectedDay, focusedDay) {
           notifier.onDaySelected(selectedDay, focusedDay);
         },
+        holidayPredicate: (day) {
+          return day.weekday == DateTime.friday ||
+              day.weekday == DateTime.saturday;
+        },
+        daysOfWeekHeight: 40,
+        daysOfWeekStyle: const DaysOfWeekStyle(
+          weekdayStyle: TextStyle(color: AppColors.optionalColor),
+          weekendStyle: TextStyle(color: Colors.red),
+        ),
+        focusedDay: state.focusedDay,
+        firstDay: kFirstDay,
+        lastDay: kLastDay,
+        calendarFormat: state.calendarFormat,
+        formatAnimationCurve: Curves.bounceInOut,
+        weekNumbersVisible: false,
+        selectedDayPredicate: (day) => isSameDay(state.selectedDay, day),
+        eventLoader: (day) => [],
         onFormatChanged: notifier.onFormatChanged,
         onPageChanged: notifier.onPageChanged,
+        calendarBuilders: CalendarBuilders(
+          markerBuilder: (context, day, events) {
+            if (events.isNotEmpty && day != state.selectedDay) {
+              return Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  padding: day.day < 10
+                      ? const EdgeInsets.all(15.5)
+                      : const EdgeInsets.all(12.0),
+                  child: Text(
+                    '${day.day}',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
+              );
+            }
+            return null;
+          },
+          holidayBuilder: (context, day, focusedDay) {
+            if (day.weekday == DateTime.friday ||
+                day.weekday == DateTime.saturday) {
+              return Center(
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.red.withOpacity(0.04),
+                    shape: BoxShape.circle,
+                  ),
+                  padding: day.day < 10
+                      ? const EdgeInsets.all(16.0)
+                      : const EdgeInsets.all(12.0),
+                  child: Text(
+                    '${day.day}',
+                    style: const TextStyle(color: Colors.red),
+                  ),
+                ),
+              );
+            }
+            return null;
+          },
+          selectedBuilder: (context, day, focusedDay) {
+            return Center(
+              child: Container(
+                decoration: state.selectedDay == day
+                    ? BoxDecoration(
+                  border: Border.all(color: AppColors.appbarColor),
+                  shape: BoxShape.circle,
+                )
+                    : const BoxDecoration(
+                  color: AppColors.appbarColor,
+                  shape: BoxShape.circle,
+                ),
+                padding: day.day < 10
+                    ? const EdgeInsets.all(16.0)
+                    : const EdgeInsets.all(12.0),
+                child: Text(
+                  '${day.day}',
+                  style: TextStyle(
+                      color: state.selectedDay == day
+                          ? AppColors.appbarColor
+                          : AppColors.whiteColor),
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }
