@@ -13,13 +13,15 @@ import 'holiday_calendar_state.dart';
 class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
   late final HolidayRepository _repository;
 
+  // Cache for events (synchronous)
+  final Map<DateTime, List<Event>> _dayEventsCache = {};
+
+  // Constructor: Repository initialization
   @override
   HolidayCalendarState build() {
-    // get the repository
     _repository = ref.watch(holidayRepositoryDbProvider);
 
-    // On app startup, ensure DB is seeded with mock data
-    // This runs once when the provider is created.
+    // Ensure DB is seeded with mock data on app startup
     _repository.initMockData();
 
     final now = DateTime.now();
@@ -32,99 +34,103 @@ class HolidayCalendarNotifier extends Notifier<HolidayCalendarState> {
     );
   }
 
-
-
-
-
-  List<Event>? getHolidays(DateTime day) {
-    return _repository.getEvents(day);
+  /// Get holidays for a specific day (synchronous)
+  List<Event> getHolidays(DateTime day) {
+    return _repository.getEvents(day) ?? [];
   }
 
+  /// Fetch all events (user-added + holidays) for a specific day and store them
+  Future<void> loadEventsForDay(DateTime day) async {
+    // Fetch user-added events asynchronously
+    final eventsFromDB = await _repository.getEventsForDay(day);
 
-  Future<List<Event>> getEventsForDay(DateTime day) {
-    return _repository.getEventsForDay(day);
+    // Fetch holidays synchronously
+    final holidayEvents = getHolidays(day);
+
+    // Combine events and cache them
+    _dayEventsCache[day] = (eventsFromDB ?? []) + (holidayEvents);
+
+    // Update `selectedEvents` if the day matches the selectedDay
+
+
+    // Notify UI to rebuild if necessary (e.g., Riverpod listeners)
   }
 
+  /// Return all events (user-added + holidays) for a specific day (synchronously)
+  List<Event> getEventsForDaySync(DateTime day) {
+    // Check the cache; if not loaded, return an empty list
+    return _dayEventsCache[day] ?? [];
+  }
 
-
-  // Called when user taps a day in the calendar
+  /// Called when user selects a day in the calendar
   Future<void> onDaySelected(DateTime selectedDay, DateTime focusedDay) async {
-    final events = await _repository.getEventsForDay(selectedDay);
+    // Load events for the selected day
+    await loadEventsForDay(selectedDay);
+
+    // Update state with selected day and events
     state = state.copyWith(
       selectedDay: selectedDay,
       focusedDay: focusedDay,
-      selectedEvents: events,
+      selectedEvents: getEventsForDaySync(selectedDay),
       showResetButton: true,
     );
   }
 
+  /// Insert a new user-added event into the database for the selected day
+  Future<void> addEventForSelectedDay(Event event) async {
+    if (state.selectedDay == null) return;
+
+    // Insert event into the database
+    await _repository.addEvent(state.selectedDay!, event);
+
+    // Reload events for the day to include the new event
+    await loadEventsForDay(state.selectedDay!);
+  }
+
+  /// Delete a user-added event from the database for the selected day
+  Future<void> deleteEventForSelectedDay(Event event) async {
+    if (state.selectedDay == null) return;
+
+    // Delete event from the database
+    await _repository.deleteEvent(state.selectedDay!, event);
+
+    // Reload events for the day to reflect the deletion
+    await loadEventsForDay(state.selectedDay!);
+  }
+
+  /// Reset to the current day and clear selected events
+  Future<void> resetToCurrentDay() async {
+    final now = DateTime.now();
+
+    // Reload events for today
+    await loadEventsForDay(now);
+
+    // Update state to reflect today's date and events
+    state = state.copyWith(
+      selectedDay: now,
+      focusedDay: now,
+      selectedEvents: getEventsForDaySync(now),
+      showResetButton: false,
+    );
+  }
+
+  /// Called when the calendar format changes (e.g., month to week)
   void onFormatChanged(CalendarFormat newFormat) {
     if (state.calendarFormat != newFormat) {
       state = state.copyWith(calendarFormat: newFormat);
     }
   }
 
+  /// Called when the user changes pages in the calendar
   void onPageChanged(DateTime focusedDay) {
     state = state.copyWith(focusedDay: focusedDay, showResetButton: true);
   }
 
-  Future<void> resetToCurrentDay() async {
-    final now = DateTime.now();
-    state = state.copyWith(
-      selectedDay: now,
-      focusedDay: now,
-      selectedEvents: [],
-      showResetButton: false,
-    );
-  }
-
-
-  /// Insert a new event into the DB for the selected day.
-  Future<void> addEventForSelectedDay(Event event) async {
-    if (state.selectedDay == null) return;
-    // Insert to DB
-    await _repository.addEvent(state.selectedDay!, event);
-
-    // Re-fetch
-    final updatedEvents = await _repository.getEventsForDay(state.selectedDay!);
-    state = state.copyWith(selectedEvents: updatedEvents);
-  }
-
-  Future<void> deleteEventForSelectedDay(Event event) async {
-    if (state.selectedDay == null) return;
-    // 1) Delete from DB
-    await _repository.deleteEvent(state.selectedDay!, event);
-
-    // 2) Re-fetch updated events
-    final updatedEvents = await _repository.getEventsForDay(state.selectedDay!);
-    state = state.copyWith(selectedEvents: updatedEvents);
-  }
-
-
-  // Utility to get a formatted selected day
+  /// Utility to get a formatted string for the selected day
   String getSelectedDayFormatted() {
     final day = state.selectedDay ?? DateTime.now();
     return DateFormat("dd/MM/yyyy").format(day);
   }
-
-  final Map<DateTime, List<Event>> _dayEventsCache = {};
-
-  List<Event>? all = [];
-
-
-  /// Asynchronous method to fetch events from DB and store them in `_dayEventsCache`.
-  Future<void> loadEventsForDay(DateTime day) async {
-    final eventsFromDB = await _repository.getEventsForDay(day);
-    _dayEventsCache[day] = eventsFromDB;
-    // to rebuild UI if needed
-  }
-
-  /// Synchronous method returning events from cache
-  List<Event> getEventsForDaySync(DateTime day) {
-    final events =  getHolidays(day);
-    //all = (_dayEventsCache[day] ?? []) + (events ?? []);
-    //print(all.toString());
-    return events ?? [];
-  }
 }
+
 
