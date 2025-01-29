@@ -13,14 +13,10 @@ class HolidayCalendarScreen extends ConsumerWidget {
   const HolidayCalendarScreen({Key? key}) : super(key: key);
 
 
-
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final calendarState = ref.watch(holidayCalendarProvider);
     final calendarNotifier = ref.read(holidayCalendarProvider.notifier);
-
-
 
     return Scaffold(
       appBar: CustomAppBarWithShadow(

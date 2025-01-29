@@ -53,7 +53,6 @@ class HolidayRepository {
     await dbService.insertEvent(date, event);
   }
 
-  // holiday_repository.dart
   Future<void> deleteEvent(DateTime date, Event event) async {
     // If you have a DB service:
     await dbService.deleteEvent(date, event);
