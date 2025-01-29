@@ -60,11 +60,10 @@ class HolidayCalendarScreen extends ConsumerWidget {
         child: TableCalendar(
           locale: 'en_US',
           headerStyle: HeaderStyle(
-              headerPadding: const EdgeInsets.only(left: 8, right: 8),
+              headerPadding: const EdgeInsets.only(left: 8, right: 8, bottom: 8, top: 8),
               formatButtonVisible: false,
               titleCentered: true,
-              titleTextStyle:
-                  const TextStyle(fontSize: 16, color: AppColors.blackColor),
+              titleTextStyle: const TextStyle(fontSize: 16, color: AppColors.blackColor),
               decoration: BoxDecoration(
                 color: AppColors.appbarColor.withOpacity(.15),
                 borderRadius: const BorderRadius.only(
